@@ -1,4 +1,4 @@
-# 22210908 Thomas De Laubier
+# 22210908 Thomas de Laubier
 
 # Section 1 les imports
 import requests

@@ -27,7 +27,7 @@ library(sandwich)
 library(stargazer)
 ```
 
-**DE LAUBIER - Thomas**
+**Thomas de Laubier**
 
 [**Master 1 MAS - Université Rennes
 2**](https://formations.univ-rennes2.fr/fr/formations/master-37/master-mention-mathematiques-appliquees-statistique-parcours-sciences-des-donnees-intelligence-artificielle-JFTJBMKM.html)
