@@ -12,18 +12,7 @@
 
 ---
 
-Projets académiques et appliqués développés au cours du Master MAS (Mathématiques Appliquées, Statistique) à l'Université Rennes 2.
-
----
-
-## Points clés
-
-- **Deep Learning *from scratch* :** Rétropropagation manuelle, architecture `nn.Module` et `Trainer` modulaire comparant SGD, Momentum et Adam.
-- **Économétrie empirique :** Étude sur la concentration spatiale des diplômés avec erreurs-types robustes et [rapport HTML interactif](./spatial-econometrics-education/index.html).
-- **Algorithmes fondamentaux :** $k$-NN vectorisé en NumPy et ACP matricielle $(X, Q, D)$ en R codés sans bibliothèques boîtes noires.
-- **Data engineering & NLP :** ETL relationnel sur 6 tables automobiles, analyse de discours politiques avec spaCy et scraping parallèle.
-
----
+Projets académiques et appliqués développés au cours du Master MAS (Mathématiques Appliquées, Statistique) parcours Sciences des données, Intelligence artificielle à l'Université Rennes 2.
 
 ## Projets
 
