@@ -12,18 +12,7 @@
 
 ---
 
-Academic and applied data science projects developed during the Master MAS (Applied Mathematics & Statistics) at Université Rennes 2.
-
----
-
-## Highlights
-
-- **Deep Learning from scratch:** Manual backpropagation, custom `nn.Module` architectures, and an extensible `Trainer` benchmarking SGD, Momentum, and Adam.
-- **Empirical econometrics:** Territory-level regression study on graduate concentration with robust standard errors and an [interactive HTML report](./spatial-econometrics-education/index.html).
-- **Core ML algorithms:** Vectorized $k$-NN in NumPy and exact metric triplet $(X, Q, D)$ PCA in R coded without high-level wrappers.
-- **Data engineering & NLP:** Multi-table relational ETL on automotive sales, French speech text-mining with spaCy, and parallel web scraping.
-
----
+Academic and applied data science projects developed during the MSc in Applied Mathematics, Statistics - Data Science, Artificial Intelligence Track at Université Rennes 2.
 
 ## Projects
 
