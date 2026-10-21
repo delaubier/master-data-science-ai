@@ -1,0 +1,41 @@
+---
+title: "TP2"
+output: pdf_document
+date: "2026-09-14"
+---
+
+```{r}
+library(fda)
+```
+
+***1. Bases de Fourier***
+
+*1.1 Tracé des fonctions de bases*
+
+```{r}
+# 1.(b)
+fourier <- create.fourier.basis(c(0,1), 9)
+plot(fourier)
+```
+
+```{r}
+# 2.
+(eval1 <- getbasismatrix(seq(0, 1, .01), fourier, 1))
+oldpar <- par(no.readonly=TRUE)
+matplot(eval1, type="l")
+```
+
+```{r}
+# 3.
+(eval2 <- eval.basis(seq(0, 1, .01), fourier))
+matplot(eval2, type="l")
+```
+
+*1.2 Simuler des fonctions aléatoires*
+
+```{r}
+coeff = runif(9, -1, 1)
+ft <- apply(t(coeff*t(eval2)), 1, sum)
+ft
+plot(ft, type="l")
+```

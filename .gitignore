@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# R artifacts
+.Rhistory
+.RData
+.Rproj.user/
+*.rdb
+*.rdx
+
+# Large tables and binaries
+*.mp4
+*.tsv
+*.zip
+*.tar.gz
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini

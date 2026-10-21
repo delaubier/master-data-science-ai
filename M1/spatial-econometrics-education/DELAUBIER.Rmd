@@ -1,0 +1,441 @@
+---
+title: "Quels sont les facteurs qui favorisent une forte concentration de diplômés du supérieur dans une zone géographique ?"  
+date: "`r Sys.Date()`"
+output:
+  rmdformats::robobook:
+    highlight: kate
+    number_sections: TRUE
+    donnees_print: paged
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, cache = TRUE) #Activer le cache des chunks pour accélérer les recompilations
+options("install.lock"=FALSE) #Désactiver le verrouillage d’installation des packages
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) ## configure le chemin du dossier automatiquement
+
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(corrplot)
+library(car)
+library(MASS)
+library(lmtest)
+library(sandwich)
+library(stargazer)
+```
+
+**DE LAUBIER - Thomas**
+
+[**Master 1 MAS - Université Rennes
+2**](https://formations.univ-rennes2.fr/fr/formations/master-37/master-mention-mathematiques-appliquees-statistique-parcours-sciences-des-donnees-intelligence-artificielle-JFTJBMKM.html)
+
+# Introduction
+
+La répartition des compétences sur le territoire est un enjeu majeur
+dans une économie de la connaissance. Alors que la "massification
+scolaire" a permis d'élever le niveau général d'éducation en France, on
+observe paradoxalement une forte polarisation géographique : les talents
+semblent se concentrer dans quelques territoires élus, laissant d'autres
+zones en marge de cette dynamique.
+
+**Contexte et problématique :** La France se caractérise par une forte
+métropolisation et des disparités régionales marquées. Si les diplômés
+sont théoriquement plus mobiles, ils ne se répartissent pas
+aléatoirement. Notre problématique est la suivante : **Dans quelle
+mesure les caractéristiques socio-économiques locales déterminent-elles
+la concentration de diplômés de l'enseignement supérieur dans les
+départements français ?**
+
+**Motivation et intérêt du sujet :** Ce sujet est au carrefour de
+plusieurs disciplines et enjeux actuels :
+
+1.  **Enjeu Économique (Croissance Endogène) :** Selon les économistes
+    (Romer, Lucas), le capital humain est le moteur principal de
+    l'innovation et de la croissance locale. Comprendre où vont les
+    diplômés, c'est comprendre qui sera riche demain.
+
+2.  **Enjeu Politique (Aménagement du territoire) :** Les politiques
+    d'attractivité (ex: "Villes universitaires", transports, cadre de
+    vie) cherchent à capter cette ressource. Il est crucial de savoir si
+    ces leviers sont efficaces face au poids de la structure
+    industrielle.
+
+3.  **Enjeu Social :** La "fracture territoriale" se joue aussi sur les
+    diplômes. L'étude de ces déterminants permet d'objectiver les
+    inégalités entre les métropoles et la "France périphérique".
+
+**Hypothèses de travail :** Nous chercherons à tester trois mécanismes
+d'attraction :
+
+1.  **L'effet "Marché du travail" :** Les diplômés vont là où sont les
+    emplois qualifiés (corrélation avec les Cadres).
+
+2.  **L'effet "Revenu" :** Le niveau de vie local agit comme un signal
+    de prospérité attractif.
+
+3.  **L'effet "Aménités" :** La densité urbaine et la présence de jeunes
+    favorisent la concentration de capital humain (vie culturelle,
+    services).
+
+**Objectifs :** Ce projet vise à quantifier le poids respectif de ces
+facteurs à l'aide d'une modélisation sur des données départementales de
+l'INSEE.
+
+# Cadre méthodologique
+
+**Données et périmètre :** Nous travaillons sur des données en coupe
+transversale (*cross-section*) à l'échelle départementale pour la France
+métropolitaine ($N=96$ observations).
+
+**Méthode d'estimation : La Régression Linéaire Multiple (MCO)** Pour
+identifier les facteurs explicatifs, nous utilisons un modèle
+économétrique estimé par la méthode des **Moindres Carrés Ordinaires
+(MCO)**.
+
+-   **Le principe :** Cette méthode consiste à modéliser la relation
+    entre notre variable d'intérêt ($Y$ : le taux de diplômés) et
+    plusieurs variables explicatives ($X_1, X_2...$). L'algorithme
+    cherche à tracer l'hyperplan qui traverse le nuage de points en
+    minimisant la somme des carrés des erreurs (les résidus),
+    c'est-à-dire la distance verticale entre la réalité et la prédiction
+    du modèle.
+-   **L'intérêt :** Contrairement à une simple analyse bivariée
+    (corrélation), la régression multiple permet de raisonner "toutes
+    choses égales par ailleurs". Elle nous permet par exemple de mesurer
+    l'effet propre du "Niveau de vie" sur les diplômés, en contrôlant
+    (neutralisant) l'effet de la densité ou du chômage.
+
+**Spécification du modèle :** L'équation économétrique testée est la
+suivante :
+
+$Y_{Diplome} = \beta_0 + \beta_1 Cadres + \beta_2 Ouvriers + \beta_3 Chomage + \beta_4 NivVie +$
+$\beta_5 Densite + \beta_6 Jeunes + \beta_7 Locat + \beta_8 Femmes + \varepsilon$
+
+Où $\varepsilon$ représente le terme d'erreur (les facteurs non
+observés). Nous procéderons ensuite à une sélection de variables
+(Stepwise AIC) pour ne conserver que les déterminants les plus robustes.
+
+**Stratégie d'estimation :** Nous estimerons d'abord le modèle complet,
+puis nous procéderons à une sélection de variables (AIC/Stepwise) pour
+traiter la multicolinéarité potentielle. Enfin, nous testerons la
+robustesse des résidus (Homoscédasticité).
+
+# **Analyse des données**
+
+## Cadre des données
+
+**Sources et Temporalité :** Afin de garantir la pertinence de
+l'analyse, nous avons mobilisé les données les plus récentes disponibles
+à ce jour. La base de données est constituée d'indicateurs
+socio-économiques portant principalement sur la période **2021-2022**
+(Recensement, Revenus fiscaux), avec une actualisation pour le taux de
+chômage (moyenne annuelle **2024**).
+
+**Périmètre géographique :** L'analyse couvre l'ensemble des
+**départements de France métropolitaine**.
+
+*Note :* Les départements et régions d'outre-mer n'ont pas été inclus
+dans le champ de l'étude afin d'assurer l'homogénéité statistique des
+territoires comparés.
+
+**Tableau récapitulatif des variables :**
+
+| Code de la série | Définition | Unité | Source |
+|:-----------------|-------------------|:----------------:|-----------------:|
+| Diplome | Part des diplômés du supérieur (Bac+2 et plus) | \% | INSEE |
+| Cadres | Part des cadres et prof. intellectuelles sup. | \% | INSEE |
+| Ouvriers | Part des ouvriers (Lieu de Travail) | \% | INSEE |
+| Chomage | Taux de chômage annuel moyen | \% | INSEE |
+| NivVie | Médiane du niveau de vie | Euros | INSEE |
+| Densite | Densité de population | Hab/km² | INSEE |
+| Jeunes | Part des 15-24 ans | \% | INSEE |
+| Locat | Part des locataires (Rés. principales) | \% | INSEE |
+| Femmes | Taux d'activité des femmes (25-54 ans) | \% | INSEE |
+
+## Prétraitement et nettoyage des données
+
+Un travail préliminaire de structuration de la base de données a été
+effectué en amont sur Excel pour construire les indicateurs pertinents
+et nettoyer les valeurs manquantes.
+
+**1. Construction des variables (Calculs Excel) :**
+
+**Variable cible** ($Y_{Diplome}$) : Nous avons agrégé les niveaux de
+diplôme du supérieur pour obtenir un taux global. La variable correspond
+à la somme de la *part des diplômés Bac+2*, *Bac+3/4* et *Bac+5 ou plus*
+(dans la population non scolarisée de 15 ans et plus en 2022).
+
+**Variable démographique** ($Jeunes$) : Pour isoler la population
+étudiante et jeune active (15-24 ans), nous avons procédé par
+soustraction : *Part des moins de 25 ans* (2021) moins *Part des moins
+de 15 ans* (2021).
+
+**2. Gestion du périmètre géographique (Nettoyage) :**
+
+Nous avons exclu les départements d'Outre-mer de l'analyse.
+
+*Justification :* Ces territoires présentaient des données manquantes
+pour la majorité des variables explicatives. Pour garantir la robustesse
+du modèle sur un périmètre homogène, nous avons restreint l'étude aux 96
+départements métropolitains.
+
+```{r}
+donnees <- read.csv("data.csv", sep=";", header = TRUE)
+
+donnees$Diplome <- as.numeric(donnees$Diplome)
+donnees$Jeunes <- as.numeric(donnees$Jeunes)
+donnees$Chomage <- as.numeric(donnees$Chomage)
+donnees$NivVie <- as.numeric(donnees$NivVie)
+donnees$Densite <- as.numeric(donnees$Densite)
+donnees$Locat <- as.numeric(donnees$Locat)
+donnees$Cadres <- as.numeric(donnees$Cadres)
+donnees$Ouvriers <- as.numeric(donnees$Ouvriers)
+donnees$Femmes <- as.numeric(donnees$Femmes)
+
+donnees <- donnees %>% na.omit()
+```
+
+## Analyse descriptive univariée des données
+
+```{r, results='asis'}
+stargazer(donnees, type = "html", title="Statistiques Descriptives", digits=1, median=TRUE)
+
+ggplot(donnees, aes(x = Diplome)) +
+  geom_histogram(color = "black", fill = "yellow", bins=15) + 
+  ggtitle("Fig 1. Distribution du taux de diplômés") + 
+  xlab("Part des diplômés du supérieur (%)") + 
+  ylab("Nombre de départements") +
+  theme_minimal()
+```
+
+**Interprétation de l'analyse descriptive :**
+
+L'analyse de la variable Densité (tableau ci-dessus) révèle une très
+forte hétérogénéité territoriale.
+
+La médiane se situe autour de 86 hab/km², ce qui indique que la moitié
+de la France est composée de départements ruraux ou peu denses.
+
+À l'inverse, la moyenne est tirée vers le haut (561 hab/km²) par des
+valeurs extrêmes (le maximum dépasse 20 000 hab/km² pour Paris).
+
+Conclusion : Nos données reflètent une opposition structurelle entre une
+majorité de territoires ruraux et quelques pôles urbains très denses qui
+concentrent potentiellement les aménités.
+
+La grande majorité des départements (le pic de l'histogramme) se situe
+entre 25% et 30% de diplômés. Cela correspond à la "France moyenne",
+souvent périurbaine ou rurale.
+
+La queue de distribution à droite regroupe des départements "élites"
+dépassant les 45% (Paris, Hauts-de-Seine, Rhône). À l'inverse, les
+départements ruraux (Cantal, Creuse, Haute-Marne) peinent à dépasser les
+20-22%, illustrant la difficulté de retenir les jeunes qualifiés hors
+des métropoles.
+
+## Analyse descriptive bivariée des données
+
+```{r}
+corrplot(cor(donnees[, 3:11]), method="number")
+
+plot(donnees$Cadres, donnees$Diplome, pch = 19, col = "blue", main = "Corrélation Cadres / Diplômés", xlab = "Part des Cadres", ylab = "Part des Diplômés")
+abline(lm(Diplome ~ Cadres, data=donnees), col="red", lwd=2)
+```
+
+**Interprétation de l'analyse bivariée :**
+
+-   **Matrice de corrélation :** Nous observons une très forte
+    corrélation positive (r\>0.8) entre la part des Cadres et le taux de
+    Diplômés, ce qui valide notre intuition première. À l'inverse, la
+    part des Ouvriers est négativement corrélée au diplôme. On note
+    également un risque de collinéarité entre le Niveau de vie et les
+    Cadres, car ces deux variables varient souvent ensemble.
+
+    **Le lien Cadres / Locataires (**0.77) : Cette forte corrélation
+    s'explique par le fait géographique : les cadres vivent
+    majoritairement dans les grandes métropoles où le marché immobilier
+    est tendu et la part de locataires plus élevée (contrairement aux
+    zones rurales de propriétaires).
+
+    **L'opposition Ouvriers / Diplômes (**-0.79) : Ce coefficient
+    négatif massif confirme la spécialisation territoriale. Les anciens
+    bassins industriels (Nord, Est) ont structurellement moins attiré
+    les nouvelles populations diplômées du tertiaire.
+
+<!-- -->
+
+-   **Nuage de points (Graphique Cadres / Diplômés) :** La relation
+    linéaire est ici évidente. Les points sont alignés le long de la
+    droite de régression rouge. Cela suggère qu'une modélisation
+    linéaire (MCO) est adaptée pour expliquer ce phénomène. On remarque
+    toutefois une dispersion plus forte pour les valeurs élevées, signe
+    potentiel d'hétéroscédasticité que nous testerons plus loin.
+
+# **Analyse et discussion des résultats**
+
+## Modélisation principale
+
+```{r, results='asis'}
+modele <- lm(Diplome ~ Cadres + Ouvriers + Chomage + NivVie + 
+                       Densite + Jeunes + Locat + Femmes, 
+                       data = donnees)
+
+stargazer(modele, type="html", title="Estimation MCO Complète")
+```
+
+Le modèle final présente un pouvoir explicatif exceptionnel, avec un R2
+ajusté de 0.954. Cela signifie que 95,4 % de la variance géographique du
+taux de diplômés est expliquée par nos variables.
+
+L'analyse des coefficients valide nos hypothèses principales :
+
+**Structure socio-professionnelle :** La variable Cadres a un effet
+positif significatif (β≈0.21,p\<0.01). À l'inverse, la part d'Ouvriers
+exerce un fort effet négatif sur la concentration de diplômés (β≈−0.69).
+C'est le déterminant le plus impactant.
+
+**Niveau de vie :** Le revenu médian (NivVie) est positivement corrélé à
+la présence de diplômés (p\<0.01), confirmant l'attractivité des
+territoires riches.
+
+**Démographie :** La part des Femmes actives est un facteur très
+significatif et positif.
+
+La variable Chômage a été retirée par l'algorithme de sélection
+ci-après, suggérant que son effet est capté par les autres variables
+économiques.
+
+## Robustesse des résultats
+
+```{r}
+vif(modele)
+
+modele_optimal <- stepAIC(modele, direction = "both", trace = FALSE)
+stargazer(modele_optimal, type="text", title="Modèle Optimale")
+
+bptest(modele_optimal)
+```
+
+1.  **Détection de la Multicolinéarité (VIF) :** Le calcul des Variance
+    Inflation Factors (VIF) montre des valeurs élevées pour la variable
+    Cadres (9.71) et Locataires (8.45). Une valeur proche de 10 indique
+    une forte collinéarité. Cela est logique, les zones où vivent les
+    cadres sont souvent celles où il y a beaucoup de locataires (grandes
+    villes). Bien que cela ne biaise pas les prédictions global du
+    modèle, cela rend les coefficients individuels de ces variables plus
+    instables.
+
+2.  **Sélection de modèle (StepAIC) :** La procédure de sélection
+    automatique (minimisation de l'AIC) a conduit à supprimer la
+    variable Chômage. Le modèle optimal conserve donc 7 variables
+    explicatives. Cette suppression permet d'alléger le modèle sans
+    perdre en pouvoir explicatif, tout en réduisant légèrement la
+    collinéarité.
+
+3.  **Hétéroscédasticité (Test de Breusch-Pagan) :** Le test de
+    Breusch-Pagan renvoie une p-value de 0.022 (inférieure au seuil de
+    5%). Conclusion : Nous rejetons l'hypothèse nulle
+    d'homoscédasticité. Les résidus ne sont pas constants (la variance
+    de l'erreur est probablement plus forte dans les grands
+    départements). Correction : Pour corriger ce biais sur les
+    écarts-types, il est recommandé de lire la significativité des
+    coefficients avec des estimateurs robustes (Matrice HC ou Sandwich),
+    bien que cela ne change pas le signe des coefficients estimés.
+
+## Analyses complémentaires
+
+```{r, echo=FALSE}
+plot(modele_optimal, 4, main="Distance de Cook : Détection des points influents")
+abline(h = 4/nrow(donnees), col="red", lty=2)
+
+modele_inter <- lm(Diplome ~ Cadres * NivVie + Ouvriers + Densite + Jeunes + Femmes, data = donnees)
+
+stargazer(modele_inter, type="text", title="Test d'Interaction : Cadres * NivVie")
+```
+
+**Interprétation de l'interaction (Cadres \* Niveau de Vie) :**
+
+Nous avons testé l'hypothèse d'un effet croisé entre l'offre d'emploi
+qualifié et le revenu. Les résultats montrent une interaction faiblement
+significative (p\<0.1) et négative. Cela indique un léger effet de
+saturation : l'impact marginal des cadres sur la concentration de
+diplômés tend à diminuer lorsque le niveau de vie est déjà très élevé.
+
+Conclusion de robustesse : Cependant, l'apport majeur de ce test est de
+confirmer la stabilité du modèle. Même en introduisant cette complexité,
+les déterminants structurels restent inchangés et très significatifs :
+la part des Ouvriers conserve son fort impact négatif (−0.700\*\*\*) et
+la Densité reste positive. Nos résultats principaux ne dépendent donc
+pas de la spécification du modèle.
+
+# **Conclusion générale et perspectives**
+
+**Synthèse des résultats :** Notre modélisation confirme que la
+géographie du capital humain n'est pas aléatoire. Elle suit une logique
+de polarisation pilotée par :
+
+1.  **Le marché du travail local :** C'est le facteur déterminant. La
+    présence de **Cadres** attire les diplômés ($\beta > 0$), tandis que
+    les territoires à forte tradition ouvrière (**Ouvriers**) peinent à
+    les retenir ($\beta < 0$).
+
+2.  **Le cadre de vie :** Le niveau de vie et la densité jouent un rôle
+    positif, validant l'hypothèse des aménités urbaines.
+
+**Discussion sur le sens de la causalité :** Nous avons modélisé la
+relation dans le sens : *Structure de l'emploi* $\rightarrow$ Taux de
+Diplômés.
+
+Nous considérons en effet que l'histoire industrielle ou tertiaire d'un
+département est une variable structurelle qui détermine son
+attractivité. Toutefois, il existe une probable endogénéité (cercle
+vertueux) : les entreprises qualifiées s'installent aussi là où les
+compétences sont déjà présentes.
+
+**Confrontation avec l'étude de référence :** Nos conclusions
+s'inscrivent en parfaite cohérence avec l'étude de référence "**Région
+de naissance, région de résidence : les mobilités des diplômés du
+supérieur"**. Cette étude soulignait que les jeunes diplômés quittent
+massivement leur région d'origine pour rejoindre l'Île-de-France ou les
+métropoles régionales dynamiques. Notre modèle corrobore statistiquement
+ce constat à l'échelle départementale : les variables de **Densité**
+(métropolisation) et de **Cadres** (pôles d'emploi) sont bien les
+moteurs principaux de cette concentration géographique.
+
+**Limites et Perspectives :**
+
+Il convient de noter une potentielle endogénéité dans notre modèle. Si
+nous avons considéré la part des cadres comme variable explicative, la
+relation est probablement circulaire : les entreprises s'installent là
+où le capital humain est présent, et les diplômés migrent là où sont les
+emplois.
+
+Le R2 très élevé (0.95) s'explique en partie par une corrélation
+mécanique : le statut de Cadre exigeant souvent un diplôme du supérieur,
+les deux variables sont structurellement liées. Néanmoins, l'apport des
+autres variables (Ouvriers, Densité) reste significatif pour expliquer
+les variations locales.
+
+**Note de transparence :** Dans une démarche d'optimisation,
+l'assistance d'une intelligence artificielle (Gemini) a été mobilisée
+pour l'écriture des scripts R et la révision formelle du texte.
+L'interprétation économique et la validation statistique demeurent le
+fruit de ma propre analyse.
+
+# Bibliographie - Sources
+
+**Étude de référence :**
+
+:   **Région de naissance, région de résidence : les mobilités des
+    diplômés du supérieur.**
+
+    <https://www.insee.fr/fr/statistiques/1288054>
+
+**Sources des données :**
+
+:   **Données socio-économiques et démographiques de INSEE**
+
+    <https://statistiques-locales.insee.fr/#c=indicator&view=map1>

@@ -1,0 +1,19 @@
+---
+title: "TP1"
+output: pdf_document
+date: "2026-09-07"
+---
+
+```{r}
+library(fda)
+```
+
+
+1. Données Canadian Weather
+```{r setup, include=FALSE}
+df <- CanadianWeather
+TempMoy <- df$dailyAv[,,1]
+matplot(TempMoy, type = "l", xlab="Jours", ylab="Températures")
+labels(df$region)
+matplot(TempMoy, type = "l", xlab="Jours", ylab="Températures", col = 1:4)
+```

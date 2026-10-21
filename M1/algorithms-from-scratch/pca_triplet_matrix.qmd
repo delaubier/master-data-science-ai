@@ -1,0 +1,72 @@
+```{r}
+#A centrer reduire, variance par 1/n et pas 1/n-1
+acp_ <- function(X, qq, dd) {
+  X <- data.matrix(X)
+  Q <- diag(qq)
+  Q1_2 <- diag(sqrt(diag(Q)))
+  Q_1_2 <- diag(sqrt(1/diag(Q)))
+  D <- diag(dd)
+  AF <-  Q1_2 %*% t(X) %*% D %*% X %*% Q1_2 # Matrice des produits scalaires pondérés des colonnes
+  VQ <-  eigen(AF, symmetric=TRUE)
+  lambda <- abs(VQ$values)
+  lamda1_2 <- sqrt(abs(VQ$values))
+  lamda_1_2 <- sqrt(1/abs(VQ$values))
+  ### (d) Pourcentages d’inertie
+  inertie <- lambda / sum(lambda) * 100
+  sel <- which(inertie > 1e-10)
+  B <- VQ$vectors
+  B <- B[, sel, drop = FALSE]
+  lambda <-lambda[sel, drop = FALSE]
+  lamda1_2 <- lamda1_2[sel, drop = FALSE]
+  lamda_1_2 <- lamda_1_2[sel, drop = FALSE]
+
+  A <- Q_1_2%*%B
+  Atilde <- A%*%lamda1_2
+  C<- X%*%Q%*%A%*%lamda_1_2
+  Ctilde <- C %*% lamda1_2
+  
+  return(list(
+    inertie = inertie,
+    A = A,
+    C = C,
+    coord_colonnes = Atilde,
+    coord_lignes = Ctilde
+  ))
+  
+}
+```
+
+```{r}
+qq <-c(1,1,2)
+dd <-c(4,8,2)
+X <- matrix(rep(runif(1), 3), 3, 3)
+a <- acp_(X, qq, dd )
+a
+```
+```{r}
+library(FactoMineR)
+DATA <- read.table("donnees/rhone.txt", sep="")
+a <- acp_(data.matrix(DATA), rep(1, 15), rep(1/39, 39))
+a$inertie
+a$A
+a$C
+a$coord_colonnes
+a$coord_lignes
+a1 <- PCA(DATA)
+a1$eig
+```
+   
+
+```{r}
+X <- matrix(rnorm(30), nrow = 10)
+qq <- rep(1, ncol(X))
+dd <- rep(1/10, nrow(X))
+
+res <- acp_triplet(X, qq, dd)
+
+res$inertie
+res$coord_colonnes
+res$coord_lignes
+
+```
+
