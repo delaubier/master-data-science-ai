@@ -15,3 +15,4 @@ An NLP exploration pipeline analyzing French political speech corpora using toke
 2. **`02_spacy_linguistic_processing.ipynb`**:
    - Advanced linguistic pipeline powered by the French spaCy model (`fr_core_news_md`).
    - Part-of-speech (POS) tagging, lemmatization, and named entity recognition (NER).
+

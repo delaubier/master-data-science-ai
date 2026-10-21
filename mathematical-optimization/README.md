@@ -12,3 +12,4 @@ Numerical optimization foundations for data science and loss function minimizati
 - Gradient computation on non-convex and convex surfaces.
 - Implementation of standard Gradient Descent (GD) with fixed vs adaptive learning rate schedules.
 - Loss trajectory tracking, convergence rate diagnosis, and oscillation mitigation.
+

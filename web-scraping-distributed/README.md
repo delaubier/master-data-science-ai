@@ -11,3 +11,4 @@ Web scraping pipelines developed in both Python and R, highlighting HTML parsing
 
 - `multiprocessing_scraper.py`: Asynchronous and parallel extraction using Python's `multiprocessing.Pool` with `BeautifulSoup` and `lxml` parsers.
 - `rvest_wikipedia_scraper.R`: Clean R tidyverse web scraping workflow using `rvest`, CSS selectors, and XPath extraction.
+

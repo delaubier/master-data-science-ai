@@ -15,3 +15,4 @@ Functional Data Analysis (FDA) focuses on the statistical modeling of curves, co
 2. **`02_fourier_basis_expansion.Rmd`**:
    - Expansion of signals onto orthogonal Fourier and B-spline functional bases.
    - Basis evaluation matrices, roughness penalties, and functional PCA.
+

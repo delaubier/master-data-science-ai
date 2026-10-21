@@ -23,3 +23,4 @@ Implementations of fundamental machine learning and statistical algorithms devel
 ### 3. REST API Data Pipeline (`rest_api_data_ingestion.py`)
 - Custom client interacting with public open data APIs (data.gouv and Geo API).
 - Exception handling, pagination, address parsing, and geocoding integration.
+

@@ -24,3 +24,4 @@ A relational data engineering pipeline and customer analytics project unifying 6
 
 - `pipeline_etl.py`: 8-step reproducible ETL script producing the master analytical dataset.
 - `analysis_profiling.py`: Statistical profiling, customer lifetime estimation, and basket breakdown.
+

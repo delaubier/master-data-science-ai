@@ -30,3 +30,4 @@ An empirical econometrics study investigating regional disparities in human capi
 ## 🚀 View the Interactive Report
 
 Open `index.html` in any web browser to explore the full findings, interactive tables, and analytical visualizations.
+

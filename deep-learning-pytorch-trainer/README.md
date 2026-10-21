@@ -18,3 +18,4 @@ A deep learning sequence illustrating the journey from fundamental tensor operat
    - Transition to `torch.nn.Module`, hidden linear layers with non-linear activations (ReLU).
    - Implementation of an OOP `Trainer` harness with epoch callbacks and validation loss monitoring.
    - Empirical convergence comparison between **SGD**, **SGD + Momentum**, and **Adam**.
+
